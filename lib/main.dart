@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:week1_task1/screens/main_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const MyApp(),
+  );
 }
 
 class MyApp extends StatelessWidget {

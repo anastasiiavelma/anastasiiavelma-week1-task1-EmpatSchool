@@ -13,6 +13,7 @@ class StudentWidget extends StatelessWidget {
 
     // Display data in debug console
     student.display();
+    student.displayMessage('___');
 
     return Card(
       shape: RoundedRectangleBorder(
