@@ -16,7 +16,12 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _surnameController = TextEditingController();
-  int length = studentDetails.length;
+
+  // Set для збереження id студентів
+  Set<int> uniqueStudentIds = {};
+
+  // Map для віку студентів
+  Map<int, int> studentAgeMap = {};
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +56,11 @@ class _MainScreenState extends State<MainScreen> {
                           key: UniqueKey(),
                           background: Padding(
                             padding: const EdgeInsets.fromLTRB(
-                                15.0, 20.0, 15.0, 0.0),
+                              15.0,
+                              20.0,
+                              15.0,
+                              0.0,
+                            ),
                             child: Container(
                               decoration: BoxDecoration(
                                 color: Colors.deepPurple,
@@ -73,7 +82,11 @@ class _MainScreenState extends State<MainScreen> {
                           },
                           child: Padding(
                             padding: const EdgeInsets.fromLTRB(
-                                15.0, 20.0, 15.0, 0.0),
+                              15.0,
+                              20.0,
+                              15.0,
+                              0.0,
+                            ),
                             child: StudentWidget(student: student),
                           ),
                         );
@@ -81,7 +94,8 @@ class _MainScreenState extends State<MainScreen> {
                     )
                   : Container(
                       alignment: Alignment.topCenter,
-                      child: const Text('Oops, students list is empty')),
+                      child: const Text('Oops, students list is empty'),
+                    ),
             ),
           ),
         ],
@@ -94,7 +108,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-// Використання замикання
+  // Використання замикання
   void _showAddStudentDialog(BuildContext context) {
     // Використання синтактичного цукру
     String? name;
@@ -129,7 +143,10 @@ class _MainScreenState extends State<MainScreen> {
             ElevatedButton(
               onPressed: () {
                 // Використання assert
-                assert(_nameController.text.isNotEmpty, 'Name cannot be empty');
+                assert(
+                  _nameController.text.isNotEmpty,
+                  'Name cannot be empty',
+                );
 
                 // Використання синтактичного цукру if/else
                 name = _nameController.text.isNotEmpty
@@ -140,24 +157,53 @@ class _MainScreenState extends State<MainScreen> {
                     ? _surnameController.text
                     : 'Unknown';
 
+                // Генерація ID
+                int newStudentId = UniqueKey().hashCode.abs();
+
+                // Генерація віку
+                int newStudentAge = 20 + Random().nextInt(9);
+
                 Student newStudent = Student.withDefaultSchool(
                   // Використання синтактичного цукру (Змінна точно не може бути null)
                   name: name!,
                   surname: surname!,
                   birth: DateTime.now(),
-                  age: 10 +
-                      Random().nextInt(
-                          9), // Спрацює assert, якщо вік зарандомиться менше 18
-                  studentId: 0,
+                  age: newStudentAge,
+                  studentId: newStudentId,
                 );
-                setState(() {
-                  // Робота з колекціями: додавання студента, виведення довжини списку
-                  studentDetails.add(newStudent);
-                  length = studentDetails.length;
-                });
-                Navigator.of(context).pop();
-                if (kDebugMode) {
-                  print('Length of studentDetails list: $length');
+
+                if (!uniqueStudentIds.contains(newStudentId)) {
+                  setState(() {
+                    // Робота з колекціями: додавання студента, виведення довжини списку
+                    studentDetails.add(newStudent);
+
+                    // Додавання ID у список
+                    uniqueStudentIds.add(newStudentId);
+
+                    // Вік
+                    studentAgeMap[newStudentId] = newStudentAge;
+
+                    Navigator.of(context).pop();
+
+                    if (kDebugMode) {
+                      printStudentAges();
+                      print('new Student with added age: $newStudentAge');
+                      print('All students age: $studentAgeMap');
+                      print('First ID in set: ${uniqueStudentIds.first}');
+                      print(
+                        'contains Student with ID 345427692: ${uniqueStudentIds.contains(345427692)}',
+                      );
+                      print(
+                        'Map length students age: ${studentAgeMap.length}',
+                      );
+                      print(
+                          'Length of studentDetails list: ${studentDetails.length}');
+                    }
+                  });
+                } else {
+                  if (kDebugMode) {
+                    print('Student with ID $newStudentId already exists');
+                  }
                 }
               },
               child: const Text('Add'),
@@ -166,5 +212,16 @@ class _MainScreenState extends State<MainScreen> {
         );
       },
     );
+  }
+
+// Iterable
+  void printStudentAges() {
+    for (var entry in studentAgeMap.entries) {
+      int studentId = entry.key;
+      int age = entry.value;
+      if (kDebugMode) {
+        print('Student with ID $studentId has age $age');
+      }
+    }
   }
 }

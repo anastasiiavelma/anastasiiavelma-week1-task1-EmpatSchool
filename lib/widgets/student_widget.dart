@@ -12,8 +12,8 @@ class StudentWidget extends StatelessWidget {
     String formattedDate = DateFormat('yyyy-MM-dd').format(student.birth);
 
     // Display data in debug console
-    student.display();
-    student.displayMessage('___');
+    // student.display();
+    // student.displayMessage('___');
 
     return Card(
       shape: RoundedRectangleBorder(
